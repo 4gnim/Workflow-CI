@@ -1,0 +1,6 @@
+name: Dicoding-Fraud-CI
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    command: "python modelling.py"
