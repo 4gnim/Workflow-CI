@@ -1,4 +1,4 @@
-name: Kriteria 3 (Advanced) - Train, Save, Build, Push
+name: Train, Save, Build, Push
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
       - name: Set up job
         uses: actions/checkout@v4
 
-      # 2. Setup Python
+      # Setup Python
       - name: Set up Python 3.12.7
         uses: actions/setup-python@v5
         with:
@@ -32,6 +32,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install mlflow==2.19.0
 
+      #    Instal Conda
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-activate-base: true
+
       # Run MLflow project
       - name: Run mlflow project
         id: mlflow_run
@@ -46,7 +52,7 @@ jobs:
           echo "Latest artifact path is: $LATEST_RUN_PATH"
           echo "MODEL_URI_PATH=$LATEST_RUN_PATH" >> $GITHUB_OUTPUT
 
-      # 7. Upload Artifact
+      # Upload Artifact
       - name: Upload to Google Drive (Simulasi ke Artifacts)
         uses: actions/upload-artifact@v4
         with:
