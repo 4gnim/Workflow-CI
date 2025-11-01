@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: "3.12.7"
 
-      # Check env
+      # 3. Check env
       - name: Check Env
         run: |
           python --version
@@ -32,21 +32,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install mlflow==2.19.0
 
-      #    Instal Conda
+      # Set up Conda
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-activate-base: true
+          auto_activate: true
 
       # Run MLflow project
       - name: Run mlflow project
         id: mlflow_run
+        shell: bash -l {0}
         run: |
+          # Perintah debug untuk memastikan conda aktif
+          echo "Menjalankan 'conda info' untuk debugging:"
+          conda info
+          echo "Menjalankan mlflow run..."
           mlflow run . --experiment-name "ci-cd-prod"
 
       # Get latest MLflow run_id
       - name: Get latest MLflow run_id
         id: get_run
+        shell: bash -l {0}
         run: |
           LATEST_RUN_PATH=$(find mlruns -name MLmodel | sort -r | head -n 1 | xargs dirname)
           echo "Latest artifact path is: $LATEST_RUN_PATH"
@@ -62,6 +68,7 @@ jobs:
       # Build Docker Model
       - name: Build Docker Model
         id: build_docker
+        shell: bash -l {0}
         run: |
           mlflow build-docker --model-uri "${{ steps.get_run.outputs.MODEL_URI_PATH }}" --image-name "my-fraud-model"
           echo "IMAGE_NAME=my-fraud-model" >> $GITHUB_OUTPUT
