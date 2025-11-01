@@ -10,9 +10,6 @@ import os
 def main():
     print("Memulai skrip pelatihan 'modelling.py'...")
 
-    mlflow.set_tracking_uri("file:./mlruns")
-    mlflow.set_experiment("Fraud CI-CD Experiment")
-
     # Muat data
     try:
         df = pd.read_csv("clean_credit_card_fraud.csv")
@@ -33,31 +30,35 @@ def main():
     n_estimators = 100
     max_depth = 10
 
-    with mlflow.start_run(run_name="CI-CD Pipeline Run") as run:
-        # Log parameter
-        mlflow.log_param("n_estimators", n_estimators)
-        mlflow.log_param("max_depth", max_depth)
+    # log parameter
+    print("Logging parameters...")
+    mlflow.log_param("n_estimators", n_estimators)
+    mlflow.log_param("max_depth", max_depth)
 
-        # Latih model
-        model = RandomForestClassifier(
-            n_estimators=n_estimators, max_depth=max_depth, random_state=42
-        )
-        model.fit(X_train, y_train)
+    # Latih model
+    print("Training model...")
+    model = RandomForestClassifier(
+        n_estimators=n_estimators, max_depth=max_depth, random_state=42
+    )
+    model.fit(X_train, y_train)
 
-        # Evaluasi
-        y_pred = model.predict(X_test)
+    # Evaluasi
+    print("Evaluating model...")
+    y_pred = model.predict(X_test)
 
-        # Log Metrik
-        mlflow.log_metric("accuracy", accuracy_score(y_test, y_pred))
-        mlflow.log_metric("f1_score", f1_score(y_test, y_pred))
-        mlflow.log_metric("precision", precision_score(y_test, y_pred))
-        mlflow.log_metric("recall", recall_score(y_test, y_pred))
+    # log Metrik
+    print("Logging metrics...")
+    mlflow.log_metric("accuracy", accuracy_score(y_test, y_pred))
+    mlflow.log_metric("f1_score", f1_score(y_test, y_pred))
+    mlflow.log_metric("precision", precision_score(y_test, y_pred))
+    mlflow.log_metric("recall", recall_score(y_test, y_pred))
 
-        # Log Model
-        mlflow.sklearn.log_model(model, "model")
+    # log Model
+    print("Logging model...")
+    # 'model' adalah nama folder artefak yang akan dicari oleh build-docker
+    mlflow.sklearn.log_model(model, "model")
 
-        print(f"Pelatihan selesai. Run ID: {run.info.run_id}")
-        print(f"Model tersimpan di: {mlflow.get_artifact_uri()}/model")
+    print("Pelatihan selesai. Log otomatis masuk ke run yang aktif.")
 
 
 if __name__ == "__main__":
